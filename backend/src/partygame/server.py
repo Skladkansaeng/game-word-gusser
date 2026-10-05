@@ -87,6 +87,10 @@ def handle(lobby: Lobby, player_id: str, msg: dict, now: float) -> dict | None:
             lobby.add_custom_word(player_id, str(msg.get("text", "")))
         case "remove_custom_word":
             lobby.remove_custom_word(player_id, str(msg.get("text", "")))
+        case "remove_custom_word_by_id":
+            lobby.remove_custom_word_by_id(player_id, str(msg.get("wordId", "")))
+        case "clear_custom_words":
+            lobby.clear_custom_words(player_id, str(msg.get("playerId", "")))
         case "kick":
             lobby.kick(player_id, str(msg.get("playerId", "")))
         case "start_match":

@@ -4,6 +4,7 @@ import pytest
 
 from partygame.game import (
     AWAY_GRACE_SECONDS,
+    BUZZ_LOCK_SECONDS,
     GUESS_SECONDS,
     REVEAL_SECONDS,
     GameError,
@@ -141,6 +142,15 @@ def test_clue_timer_passes_the_turn():
     assert r.current_giver_id == second
 
 
+def test_clue_giver_who_runs_out_of_clue_time_loses_a_point():
+    lobby, _ = started(3, clue_seconds=10)
+    first, second = lobby.match.round.giver_ids
+    lobby.tick(T0 + 10.01)
+    lobby.tick(T0 + 20.02)
+    lobby.tick(T0 + 30.03)
+    assert lobby.match.scores[first] == -2 and lobby.match.scores[second] == -1
+
+
 def test_correct_guess_scores_three_and_one_each():
     lobby, _ = started(3)
     guesser, givers = roles(lobby)
@@ -156,6 +166,29 @@ def test_clue_giver_can_buzz_but_only_guesser_guesses():
     lobby.buzz(givers[0], T0 + 1)
     with pytest.raises(GameError, match="not_guesser"):
         lobby.submit_guess(givers[0], "x", T0 + 2)
+
+
+def test_answer_inside_a_sentence_wins_the_round():
+    lobby, _ = started(3)
+    guesser, _ = roles(lobby)
+    r = lobby.match.round
+    lobby.buzz(guesser, T0 + 1)
+    lobby.submit_guess(guesser, f"คิดว่าเป็น {r.word.text} แน่ ๆ", T0 + 2)
+    assert r.outcome == "correct"
+    assert lobby.match.scores[guesser] == 3
+
+
+def test_close_guess_is_wrong_but_flagged_with_matched_syllables():
+    lobby, _ = started(3)
+    guesser, _ = roles(lobby)
+    r = lobby.match.round
+    r.word = Word("จิงโจ้", "th")
+    lobby.buzz(guesser, T0 + 1)
+    lobby.submit_guess(guesser, "จิงโจ", T0 + 2)
+    assert r.phase == "clueing"
+    assert r.guesses[-1] | {"buzzerId": None} == {
+        "text": "จิงโจ", "correct": False, "close": True, "matched": ["จิง"], "buzzerId": None}
+    assert lobby.match.scores[guesser] == -1
 
 
 def test_wrong_guess_penalises_guesser_and_buzzer_and_play_continues():
@@ -174,6 +207,30 @@ def test_guesser_buzzing_wrong_loses_only_one_point():
     lobby.buzz(guesser, T0 + 1)
     lobby.submit_guess(guesser, "ผิดแน่นอน", T0 + 2)
     assert lobby.match.scores[guesser] == -1
+
+
+def test_repeated_wrong_buzzes_cost_more_each_time():
+    lobby, _ = started(3)
+    guesser, givers = roles(lobby)
+    now = T0 + 1
+    for _ in range(3):
+        lobby.buzz(givers[0], now)
+        lobby.submit_guess(guesser, "ผิดแน่นอน", now + 1)
+        now += BUZZ_LOCK_SECONDS + 1
+    scores = lobby.match.scores
+    assert scores[givers[0]] == -1 - 2 - 3
+    assert scores[guesser] == -3  # the Guesser didn't choose to buzz, so stays at -1 each
+
+
+def test_wrong_buzz_locks_the_buzzer_for_a_moment():
+    lobby, _ = started(3)
+    guesser, givers = roles(lobby)
+    lobby.buzz(givers[0], T0 + 1)
+    lobby.submit_guess(guesser, "ผิดแน่นอน", T0 + 2)
+    with pytest.raises(GameError, match="buzz_locked"):
+        lobby.buzz(givers[0], T0 + 3)
+    lobby.buzz(givers[1], T0 + 3)  # everyone else can still buzz
+    assert lobby.match.round.buzzer_id == givers[1]
 
 
 def test_spectator_cannot_buzz():
@@ -341,10 +398,26 @@ def test_custom_word_is_never_given_to_its_author_as_guesser():
         now = finish_reveal(lobby, now)
 
 
-def test_custom_only_falls_back_to_word_bank():
+def test_custom_only_needs_a_word_from_every_player():
     lobby, players = make_lobby(3, word_source="custom")
+    lobby.add_custom_word(players[0], "หมูเด้ง")
+    lobby.add_custom_word(players[1], "hot dog")  # wrong language doesn't count
+    assert lobby.view(players[0], T0)["customWords"]["missing"] == players[1:]
+    with pytest.raises(GameError, match="missing_custom_words"):
+        lobby.start_match(players[0], T0)
+
+
+def test_custom_only_falls_back_to_word_bank():
+    lobby, players = make_lobby(3, word_source="custom", cycles=2)
+    for p, w in zip(players, ["หมูเด้ง", "น้องแมว", "ชาไทย"]):
+        lobby.add_custom_word(p, w)
     lobby.start_match(players[0], T0)
-    assert not lobby.match.round.word.is_custom
+    now, words = T0, []
+    while lobby.match.phase != "podium":
+        words.append(lobby.match.round.word)
+        win_round(lobby, now)
+        now = finish_reveal(lobby, now)
+    assert sum(w.is_custom for w in words) == 3 and len(words) == 6
 
 
 def test_custom_word_must_match_a_known_language():
@@ -356,8 +429,8 @@ def test_custom_word_must_match_a_known_language():
 def test_other_players_only_see_custom_word_count():
     lobby, players = make_lobby(3)
     lobby.add_custom_word(players[0], "หมูเด้ง")
-    assert lobby.view(players[1], T0)["customWords"] == {"count": 1, "mine": []}
-    assert lobby.view(players[0], T0)["customWords"] == {"count": 1, "mine": ["หมูเด้ง"]}
+    assert lobby.view(players[1], T0)["customWords"]["mine"] == []
+    assert lobby.view(players[0], T0)["customWords"]["mine"] == ["หมูเด้ง"]
 
 
 # --- Podium --------------------------------------------------------------------
@@ -379,3 +452,55 @@ def test_play_again_keeps_settings_and_custom_words():
     lobby.return_to_lobby(players[0])
     assert lobby.match is None
     assert lobby.settings.round_seconds == 45 and len(lobby.custom_words) == 1
+
+
+def test_everyone_sees_custom_word_counts_per_author():
+    lobby, players = make_lobby(3)
+    lobby.add_custom_word(players[1], "หมูเด้ง")
+    lobby.add_custom_word(players[1], "น้องแมว")
+    lobby.add_custom_word(players[2], "ชาไทย")
+    view = lobby.view(players[0], T0)["customWords"]
+    assert view["byAuthor"] == {players[1]: 2, players[2]: 1}
+    assert view["mine"] == []
+
+
+def test_host_can_clear_a_players_custom_words_without_seeing_them():
+    lobby, players = make_lobby(3)
+    lobby.add_custom_word(players[1], "หมูเด้ง")
+    lobby.add_custom_word(players[2], "ชาไทย")
+    lobby.clear_custom_words(players[0], players[1])
+    assert [w.text for w in lobby.custom_words] == ["ชาไทย"]
+
+
+def test_only_host_can_clear_custom_words():
+    lobby, players = make_lobby(3)
+    lobby.add_custom_word(players[2], "ชาไทย")
+    with pytest.raises(GameError, match="not_host"):
+        lobby.clear_custom_words(players[1], players[2])
+
+
+def test_host_sees_custom_word_lengths_but_never_the_words():
+    lobby, players = make_lobby(3)
+    lobby.add_custom_word(players[1], "ก๋วยเตี๋ยว")
+    lobby.add_custom_word(players[2], "หมูกระทะ")
+    host_view = lobby.view(players[0], T0)["customWords"]
+    assert sorted((w["syllables"], w["chars"]) for w in host_view["lengths"]) == [(2, 10), (3, 8)]
+    assert "ก๋วยเตี๋ยว" not in str(host_view) and "หมูกระทะ" not in str(host_view)
+    assert lobby.view(players[1], T0)["customWords"]["lengths"] is None
+
+
+def test_host_can_remove_one_custom_word_by_id():
+    lobby, players = make_lobby(3)
+    lobby.add_custom_word(players[1], "ก๋วยเตี๋ยว")
+    lobby.add_custom_word(players[1], "ชาไทย")
+    long_word = max(lobby.view(players[0], T0)["customWords"]["lengths"], key=lambda w: w["chars"])
+    lobby.remove_custom_word_by_id(players[0], long_word["id"])
+    assert [w.text for w in lobby.custom_words] == ["ชาไทย"]
+
+
+def test_only_host_can_remove_by_id():
+    lobby, players = make_lobby(3)
+    lobby.add_custom_word(players[1], "ชาไทย")
+    word_id = lobby.custom_words[0].id
+    with pytest.raises(GameError, match="not_host"):
+        lobby.remove_custom_word_by_id(players[2], word_id)

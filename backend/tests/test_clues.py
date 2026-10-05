@@ -1,6 +1,6 @@
 import pytest
 
-from partygame.clues import ClueRejected, first_syllable, validate_clue
+from partygame.clues import ClueRejected, first_syllable, syllable_count, validate_clue
 
 
 @pytest.mark.parametrize("clue", ["งวง", "ใหญ่", "สัตว์", " มี "])
@@ -67,3 +67,10 @@ def test_first_syllable_of_english_speech():
 
 def test_first_syllable_of_nothing_is_none():
     assert first_syllable("  ", "th") is None
+
+
+def test_syllable_count():
+    assert syllable_count("ก๋วยเตี๋ยว", "th") == 2
+    assert syllable_count("หมู กระทะ", "th") == 3
+    assert syllable_count("ice cream", "en") == 2
+    assert syllable_count("elephant", "en") == 3

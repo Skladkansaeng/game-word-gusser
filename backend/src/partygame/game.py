@@ -10,8 +10,8 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
-from partygame.clues import ClueRejected, first_syllable, validate_clue
-from partygame.words import Word, detect_language, is_correct_guess, word_bank
+from partygame.clues import ClueRejected, first_syllable, syllable_count, validate_clue
+from partygame.words import Word, detect_language, judge_guess, word_bank
 
 MIN_PLAYERS = 3
 MAX_PLAYERS = 12
@@ -24,6 +24,10 @@ REVEAL_SECONDS = 6.0
 GUESSER_POINTS = 3
 CLUE_GIVER_POINTS = 1
 WRONG_GUESS_PENALTY = -1
+CLUE_TIMEOUT_PENALTY = -1
+# Each wrong Buzz by the same player in a Round costs one more point than the last,
+# and locks their Buzz button for a moment so it can't be spammed.
+BUZZ_LOCK_SECONDS = 5.0
 
 COLORS = ["#e4572e", "#29335c", "#f3a712", "#669bbc", "#a8c686", "#8e44ad",
           "#16a085", "#d35400", "#2c3e50", "#c0392b", "#7f8c8d", "#f06292"]
@@ -124,6 +128,8 @@ class Round:
     guesses: list[dict[str, Any]] = field(default_factory=list)
     outcome: Literal["correct", "timeout", "skipped"] | None = None
     points: Counter = field(default_factory=Counter)
+    wrong_buzzes: Counter = field(default_factory=Counter)
+    buzz_locked_until: dict[str, float] = field(default_factory=dict)
 
     @property
     def participants(self) -> tuple[str, str, str]:
@@ -251,11 +257,23 @@ class Lobby:
             raise GameError("duplicate_word")
         if sum(w.author_id == by for w in self.custom_words) >= MAX_CUSTOM_WORDS_PER_PLAYER:
             raise GameError("too_many_words")
-        self.custom_words.append(Word(text=text, language=lang, author_id=by))
+        self.custom_words.append(Word(text=text, language=lang, author_id=by, id=secrets.token_hex(4)))
         self.version += 1
 
     def remove_custom_word(self, by: str, text: str) -> None:
         self.custom_words = [w for w in self.custom_words if not (w.author_id == by and w.text == text)]
+        self.version += 1
+
+    def remove_custom_word_by_id(self, by: str, word_id: str) -> None:
+        """Host removes one Custom Word picked by its length, without ever seeing it."""
+        self._require_host(by)
+        self.custom_words = [w for w in self.custom_words if w.id != word_id]
+        self.version += 1
+
+    def clear_custom_words(self, by: str, author_id: str) -> None:
+        """Host removes every Custom Word of one player, without ever seeing them."""
+        self._require_host(by)
+        self.custom_words = [w for w in self.custom_words if w.author_id != author_id]
         self.version += 1
 
     def start_match(self, by: str, now: float) -> None:
@@ -265,10 +283,20 @@ class Lobby:
         ready = [pid for pid in self.active_player_ids() if self.players[pid].connected]
         if len(ready) < MIN_PLAYERS:
             raise GameError("not_enough_players")
+        if self.players_missing_custom_words(ready):
+            raise GameError("missing_custom_words")
         self.match = Match(settings=Settings(**vars(self.settings)), participants=ready,
                            scores=Counter({pid: 0 for pid in ready}))
         self._next_round(now)
         self._touch(now)
+
+    def players_missing_custom_words(self, player_ids: list[str]) -> list[str]:
+        """With Word Source "custom", every player must bring a word in the Match language."""
+        if self.settings.word_source != "custom":
+            return []
+        lang = self.settings.word_language
+        authors = {w.author_id for w in self.custom_words if w.language == lang}
+        return [pid for pid in player_ids if pid not in authors]
 
     def return_to_lobby(self, by: str) -> None:
         self._require_host(by)
@@ -394,6 +422,8 @@ class Lobby:
         r = self._round_for(player_id)
         if r.phase != "clueing":
             raise GameError("not_clueing")
+        if now < r.buzz_locked_until.get(player_id, 0.0):
+            raise GameError("buzz_locked")
         r.phase = "guessing"
         r.buzzer_id = player_id
         r.frozen_remaining = max(0.0, r.round_deadline - now)
@@ -413,8 +443,11 @@ class Lobby:
 
     def _resolve_guess(self, r: Round, text: str | None, now: float) -> None:
         m = self.match
-        correct = text is not None and is_correct_guess(text, r.word)
-        r.guesses.append({"text": text, "correct": correct, "buzzerId": r.buzzer_id})
+        result = judge_guess(text, r.word) if text is not None else None
+        correct = result is not None and result.verdict == "correct"
+        close = result is not None and result.verdict == "close"
+        r.guesses.append({"text": text, "correct": correct, "close": close,
+                          "matched": list(result.matched) if result else [], "buzzerId": r.buzzer_id})
         if correct:
             self._award(r, r.guesser_id, GUESSER_POINTS)
             for g in r.giver_ids:
@@ -425,9 +458,12 @@ class Lobby:
                 m.fastest_guess[r.guesser_id] = len(r.clues)
             self._end_round(r, "correct", now)
             return
-        self._award(r, r.guesser_id, WRONG_GUESS_PENALTY)
+        r.wrong_buzzes[r.buzzer_id] += 1
+        buzzer_penalty = WRONG_GUESS_PENALTY * r.wrong_buzzes[r.buzzer_id]
         if r.buzzer_id != r.guesser_id:
-            self._award(r, r.buzzer_id, WRONG_GUESS_PENALTY)
+            self._award(r, r.guesser_id, WRONG_GUESS_PENALTY)
+        self._award(r, r.buzzer_id, buzzer_penalty)
+        r.buzz_locked_until[r.buzzer_id] = now + BUZZ_LOCK_SECONDS
         m.wrong_buzzes[r.buzzer_id] += 1
         r.phase = "clueing"
         r.buzzer_id = None
@@ -474,6 +510,7 @@ class Lobby:
             elif r.phase == "clueing" and now >= r.round_deadline:
                 self._end_round(r, "timeout", now)
             elif r.phase == "clueing" and r.clue_deadline and now >= r.clue_deadline:
+                self._award(r, r.current_giver_id, CLUE_TIMEOUT_PENALTY)
                 self._pass_turn(r, now)
             else:
                 return self._changed(before)
@@ -507,7 +544,16 @@ class Lobby:
             ],
             "customWords": {
                 "count": len(self.custom_words),
+                "byAuthor": dict(Counter(w.author_id for w in self.custom_words)),
                 "mine": [w.text for w in self.custom_words if w.author_id == viewer_id],
+                # The Host may judge words by length only; the text itself is never sent.
+                "lengths": [
+                    {"id": w.id, "authorId": w.author_id, "chars": len(w.text.replace(" ", "")),
+                     "syllables": syllable_count(w.text, w.language)}
+                    for w in self.custom_words if w.author_id != viewer_id
+                ] if viewer_id == self.host_id else None,
+                "missing": self.players_missing_custom_words(
+                    [p.id for p in self.players.values() if p.connected and not p.kicked]),
             },
             "match": self._match_view(viewer_id) if m else None,
         }
@@ -546,6 +592,9 @@ class Lobby:
             "clueDeadline": r.clue_deadline,
             "guessDeadline": r.guess_deadline,
             "buzzerId": r.buzzer_id,
+            "buzzLockedUntil": r.buzz_locked_until.get(viewer_id),
+            "nextBuzzPenalty": (WRONG_GUESS_PENALTY * (r.wrong_buzzes[viewer_id] + 1)
+                                if viewer_id in r.participants else None),
             "guesses": r.guesses,
             "outcome": r.outcome,
             "points": dict(r.points),

@@ -7,6 +7,8 @@ export function LobbyScreen({ conn, state }: { conn: LobbyConnection; state: Lob
   const isHost = state.you === state.hostId
   const link = `${location.origin}/?lobby=${state.code}`
   const online = state.players.filter((p) => p.connected).length
+  const missing = state.customWords.missing
+  const names = (ids: string[]) => ids.map((id) => state.players.find((p) => p.id === id)?.name).join(', ')
   const [copied, setCopied] = useState(false)
 
   const copy = async () => {
@@ -51,11 +53,11 @@ export function LobbyScreen({ conn, state }: { conn: LobbyConnection; state: Lob
 
       <div className="start-bar">
         {isHost ? (
-          <button className="btn primary big" disabled={online < 3} onClick={() => conn.send({ type: 'start_match' })}>
-            {online < 3 ? `รอผู้เล่นอีก ${3 - online} คน` : 'เริ่มเกม'}
+          <button className="btn primary big" disabled={online < 3 || missing.length > 0} onClick={() => conn.send({ type: 'start_match' })}>
+            {online < 3 ? `รอผู้เล่นอีก ${3 - online} คน` : missing.length > 0 ? `รอ ${names(missing)} เพิ่มคำ` : 'เริ่มเกม'}
           </button>
         ) : (
-          <p className="muted">รอหัวห้องกดเริ่มเกม…</p>
+          <p className="muted">{missing.includes(state.you) ? 'เพิ่มคำของคุณอย่างน้อย 1 คำ หัวห้องถึงจะเริ่มได้' : 'รอหัวห้องกดเริ่มเกม…'}</p>
         )}
       </div>
     </main>
@@ -120,7 +122,12 @@ function Stepper({ label, hint, value, min, max, step = 1, onChange }: { label: 
   )
 }
 
+/** Words this long are flagged for the Host as likely too hard. */
+const LONG_WORD_SYLLABLES = 5
+
 function CustomWords({ state, conn }: { state: LobbyState; conn: LobbyConnection }) {
+  const isHost = state.you === state.hostId
+  const lengths = state.customWords.lengths && [...state.customWords.lengths].sort((a, b) => b.syllables - a.syllables || b.chars - a.chars)
   const [text, setText] = useState('')
   const add = () => {
     if (!text.trim()) return
@@ -130,11 +137,41 @@ function CustomWords({ state, conn }: { state: LobbyState; conn: LobbyConnection
   return (
     <section className="card custom-words">
       <h2>คำของเพื่อน <span className="muted">{state.customWords.count} คำ</span></h2>
-      <p className="muted small">เพิ่มคำลับของแก๊ง คนอื่นจะไม่เห็นว่าคุณใส่คำอะไร และคุณจะไม่ได้ทายคำของตัวเอง</p>
+      {state.customWords.missing.length > 0 && (
+        <p className="missing-words">โหมดคำของเพื่อน: ทุกคนต้องเพิ่มคำ (ภาษาเดียวกับเกม) อย่างน้อย 1 คำ — ยังขาด {state.players.filter((p) => state.customWords.missing.includes(p.id)).map((p) => p.name).join(', ')}</p>
+      )}
+      <p className="muted small">เพิ่มคำลับของแก๊ง ไม่มีใครเห็นคำของคนอื่น หัวห้องเห็นแค่ความยาวไว้คัดคำที่ยาวเกินออก และคุณจะไม่ได้ทายคำของตัวเอง</p>
       <div className="join-row">
         <input value={text} maxLength={40} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} placeholder="เช่น หมูเด้ง" />
         <button className="btn" onClick={add}>เพิ่ม</button>
       </div>
+      {Object.keys(state.customWords.byAuthor).length > 0 && (
+        <ul className="word-authors">
+          {state.players.filter((p) => state.customWords.byAuthor[p.id]).map((p) => (
+            <li key={p.id}>
+              <Avatar name={p.name} color={p.color} size={24} />
+              <span className="pname">{p.name}</span>
+              <span className="muted small">{state.customWords.byAuthor[p.id]} คำ</span>
+              {isHost && p.id !== state.you && (
+                <button className="link" onClick={() => conn.send({ type: 'clear_custom_words', playerId: p.id })}>ลบคำทั้งหมด</button>
+              )}
+              {lengths && p.id !== state.you && (
+                <ul className="chips lengths">
+                  {lengths.filter((w) => w.authorId === p.id).map((w) => (
+                    <li key={w.id} className={w.syllables >= LONG_WORD_SYLLABLES ? 'long' : ''}>
+                      {w.syllables} พยางค์ · {w.chars} ตัว
+                      <button aria-label="ลบคำนี้" onClick={() => conn.send({ type: 'remove_custom_word_by_id', wordId: w.id })}>×</button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      {state.customWords.mine.length > 0 && (
+        <p className="muted small mine-label">คำของคุณ</p>
+      )}
       {state.customWords.mine.length > 0 && (
         <ul className="chips">
           {state.customWords.mine.map((w) => (

@@ -30,6 +30,8 @@ export interface Clue {
 export interface GuessRecord {
   text: string | null
   correct: boolean
+  close: boolean
+  matched: string[]
   buzzerId: string
 }
 
@@ -48,6 +50,10 @@ export interface RoundView {
   clueDeadline: number | null
   guessDeadline: number | null
   buzzerId: string | null
+  /** When this viewer may buzz again after a wrong Buzz. */
+  buzzLockedUntil: number | null
+  /** What this viewer loses if their next Buzz ends in a wrong Guess; null for spectators. */
+  nextBuzzPenalty: number | null
   guesses: GuessRecord[]
   outcome: 'correct' | 'timeout' | 'skipped' | null
   points: Record<string, number>
@@ -76,6 +82,13 @@ export interface MatchView {
   podium: Podium | null
 }
 
+export interface CustomWordLength {
+  id: string
+  authorId: string
+  chars: number
+  syllables: number
+}
+
 export interface LobbyState {
   code: string
   you: string
@@ -83,7 +96,15 @@ export interface LobbyState {
   serverNow: number
   settings: Settings
   players: PlayerInfo[]
-  customWords: { count: number; mine: string[] }
+  customWords: {
+    count: number
+    byAuthor: Record<string, number>
+    mine: string[]
+    /** Host only: lengths of other players' words. The words themselves are never sent. */
+    lengths: CustomWordLength[] | null
+    /** Players who still need to add a word before a "custom" Match can start. */
+    missing: string[]
+  }
   match: MatchView | null
 }
 
@@ -91,6 +112,8 @@ export type ClientMessage =
   | { type: 'update_settings'; settings: Partial<Settings> }
   | { type: 'add_custom_word'; text: string }
   | { type: 'remove_custom_word'; text: string }
+  | { type: 'remove_custom_word_by_id'; wordId: string }
+  | { type: 'clear_custom_words'; playerId: string }
   | { type: 'kick'; playerId: string }
   | { type: 'start_match' }
   | { type: 'return_to_lobby' }

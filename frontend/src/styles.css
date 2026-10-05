@@ -185,6 +185,24 @@ input:focus { outline: none; border-color: var(--accent); }
   box-shadow: 0 6px 0 color-mix(in srgb, var(--accent) 60%, black);
 }
 .btn.buzz small { font-family: 'IBM Plex Sans Thai', sans-serif; font-size: 0.9rem; font-weight: 400; }
+.btn.buzz { width: 100%; min-height: 112px; font-size: 2.6rem; letter-spacing: 0.06em; touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; }
+/* Clue Givers: Buzz stays available but quiet, so the clue box is the obvious thing to use. */
+.btn.buzz.secondary {
+  min-height: 0; padding: 12px 16px; font-size: 1.1rem; letter-spacing: 0.02em;
+  background: transparent; color: var(--accent); border: 2px dashed var(--accent); box-shadow: none;
+}
+.btn.buzz.secondary small { color: var(--muted); font-size: 0.8rem; }
+.btn.buzz.secondary.pressed { transform: none; background: var(--accent-soft); }
+.clue-input {
+  background: var(--accent-soft); border: 2px solid var(--accent); border-radius: var(--radius);
+  padding: 14px; display: grid; gap: 10px;
+}
+.clue-input-title { margin: 0; font-family: 'Mitr', sans-serif; font-size: 1.15rem; color: var(--accent); }
+.clue-input input { flex: 1; min-width: 0; font-size: 1.3rem; padding: 14px; }
+.clue-input .btn.primary { font-size: 1.2rem; padding-inline: 24px; }
+.btn.buzz.pressed { transform: translateY(4px) scale(0.98); box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 60%, black); }
+.btn.buzz.locked { background: var(--surface); color: var(--muted); box-shadow: none; font-size: 1.6rem; cursor: not-allowed; }
+.missing-words { margin: 0 0 8px; padding: 8px 12px; border-radius: 10px; background: var(--accent-soft); font-size: 0.9rem; }
 .btn.buzz:active { transform: translateY(4px); box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 60%, black); }
 .guess-box { background: var(--accent-soft); border-radius: var(--radius); padding: 16px; display: grid; gap: 10px; }
 .guess-box p { margin: 0; }
@@ -232,3 +250,14 @@ input:focus { outline: none; border-color: var(--accent); }
 
 /* Mitr draws a slashed zero, which reads oddly in scores. */
 .timer, .score, .stepper span { font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; font-weight: 600; }
+
+.word-authors { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 4px; }
+.word-authors li { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.mine-label { margin: 12px 0 0; }
+.mine-label + .chips { margin-top: 6px; }
+.word-authors li { flex-wrap: wrap; }
+.chips.lengths { flex-basis: 100%; margin: 2px 0 6px 32px; }
+.chips.lengths li { background: var(--bg); font-size: 0.85rem; }
+.chips.lengths li.long { background: color-mix(in srgb, var(--bad) 18%, transparent); color: var(--bad); }
+.close-guess { margin: 0; padding: 10px 14px; border-radius: var(--radius, 12px); background: var(--surface); text-align: center; }
+.close-guess strong { color: var(--good); }

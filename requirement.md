@@ -1,3 +1,4 @@
 - Buzz btn ux more efficacy
 - penalty logic for thrower
 - คนที่ใบ้ไม่ทัน ควรโดน penalty ด้วย
+- random game set custom word must have own word

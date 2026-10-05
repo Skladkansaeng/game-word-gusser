@@ -40,6 +40,21 @@ def _english_syllable_count(word: str) -> int:
     return max(1, len(_VOWEL_GROUPS.findall(stem)))
 
 
+def split_syllables(text: str, lang: Language) -> tuple[str, ...]:
+    """Thai syllables, or words for English (English syllables can't be split reliably)."""
+    words = normalize(text, lang).split()
+    if lang == "th":
+        return tuple(s for w in words for s in _thai_syllables(w))
+    return tuple(words)
+
+
+def syllable_count(text: str, lang: Language) -> int:
+    words = normalize(text, lang).split()
+    if lang == "th":
+        return sum(len(_thai_syllables(w)) for w in words)
+    return sum(_english_syllable_count(re.sub(r"[^a-z']", "", w) or w) for w in words)
+
+
 def syllables_of(word: str, lang: Language) -> set[str]:
     """Pieces of a Secret Word that may not be used as a Clue."""
     word = normalize(word, lang)

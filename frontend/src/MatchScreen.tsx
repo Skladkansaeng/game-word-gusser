@@ -37,6 +37,7 @@ function RoundStage({ conn, match, round, players, you }: { conn: LobbyConnectio
   const online = match.settings.playMode === 'online'
   const roundLeft = useCountdown(round.roundDeadline, conn.clockOffset)
   const shownLeft = round.phase === 'guessing' ? round.frozenRemaining : roundLeft
+  const lastGuess = round.guesses.at(-1)
   const name = (id: string | null) => (id ? players[id]?.name ?? '?' : '?')
   const inRound = round.role !== 'spectator'
 
@@ -77,6 +78,13 @@ function RoundStage({ conn, match, round, players, you }: { conn: LobbyConnectio
             </div>
           )}
 
+          {lastGuess?.close && (
+            <p className="close-guess">
+              “{lastGuess.text}” ใกล้เคียงแล้ว!
+              {lastGuess.matched.length > 0 && <> ถูกแล้ว: <strong>{lastGuess.matched.join(' · ')}</strong></>}
+            </p>
+          )}
+
           {round.guesses.some((g) => !g.correct) && (
             <p className="wrong-guesses">
               ตอบผิดไปแล้ว: {round.guesses.filter((g) => !g.correct).map((g, i) => <s key={i}>{g.text ?? 'หมดเวลา'}</s>)}
@@ -90,12 +98,7 @@ function RoundStage({ conn, match, round, players, you }: { conn: LobbyConnectio
                 {online && round.role === 'clue_giver' && round.currentGiverId !== you && (
                   <p className="muted">รอ {name(round.currentGiverId)} ใบ้พยางค์ต่อไป…</p>
                 )}
-                {inRound && (
-                  <button className="btn buzz" onClick={() => conn.send({ type: 'buzz' })}>
-                    BUZZ
-                    <small>{round.role === 'guesser' ? 'รู้แล้ว! ขอตอบ' : `ให้ ${name(round.guesserId)} ตอบเลย`}</small>
-                  </button>
-                )}
+                {inRound && <BuzzButton conn={conn} round={round} guesser={name(round.guesserId)} />}
                 {!inRound && <p className="muted">คุณกำลังดู รอตาของคุณนะ</p>}
               </>
             )}
@@ -215,6 +218,7 @@ function ClueInput({ conn }: { conn: LobbyConnection }) {
 
   return (
     <div className="clue-input">
+      <p className="clue-input-title">ตาคุณใบ้แล้ว!</p>
       {conn.spokenClue ? (
         <div className="spoken">
           <span>ได้ยินว่า <strong>{conn.spokenClue}</strong></span>
@@ -234,6 +238,59 @@ function ClueInput({ conn }: { conn: LobbyConnection }) {
         </div>
       )}
     </div>
+  )
+}
+
+function BuzzButton({ conn, round, guesser }: { conn: LobbyConnection; round: RoundView; guesser: string }) {
+  const lockLeft = useCountdown(round.buzzLockedUntil, conn.clockOffset)
+  const locked = lockLeft !== null && lockLeft > 0
+  // Pressed until the server answers, so a nervous double tap can't send two Buzzes.
+  const [pressed, setPressed] = useState(false)
+  useEffect(() => {
+    if (!pressed) return
+    const t = setTimeout(() => setPressed(false), 1500)  // the server refused; let them try again
+    return () => clearTimeout(t)
+  }, [pressed])
+
+  const buzz = () => {
+    if (pressed || locked) return
+    setPressed(true)
+    navigator.vibrate?.(60)
+    conn.send({ type: 'buzz' })
+  }
+  const buzzRef = useRef(buzz)
+  buzzRef.current = buzz
+
+  // Space bar buzzes for the Guesser. Clue Givers must tap, so they don't buzz by accident.
+  const guesserView = round.role === 'guesser'
+  useEffect(() => {
+    if (!guesserView) return
+    const onKey = (e: KeyboardEvent) => {
+      const typing = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement
+      if (e.code === 'Space' && !typing && !e.repeat) {
+        e.preventDefault()
+        buzzRef.current()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [guesserView])
+
+  const penalty = round.nextBuzzPenalty
+  return (
+    <button
+      className={`btn buzz ${guesserView ? '' : 'secondary'} ${pressed ? 'pressed' : ''} ${locked ? 'locked' : ''}`}
+      disabled={locked}
+      // Fire on touch-down rather than release: in a race every few milliseconds count.
+      onPointerDown={(e) => { if (e.button === 0) buzz() }}
+      onClick={(e) => { if (e.detail === 0) buzz() }}  // keyboard activation
+    >
+      {locked ? `รอ ${Math.ceil(lockLeft)} วิ` : guesserView ? 'BUZZ' : `BUZZ · ให้ ${guesser} ตอบ`}
+      <small>
+        {locked ? 'เพิ่ง Buzz ผิด' : guesserView ? 'รู้แล้ว! ขอตอบ' : `หยุดใบ้ทันที ถ้า ${guesser} ตอบผิด คุณโดนหักด้วย`}
+        {!locked && penalty !== null && penalty < -1 && ` · ถ้าผิด ${penalty}`}
+      </small>
+    </button>
   )
 }
 
