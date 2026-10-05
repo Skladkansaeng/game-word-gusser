@@ -1,0 +1,31 @@
+export const errorText: Record<string, string> = {
+  lobby_not_found: 'ไม่พบห้องนี้ อาจปิดไปแล้ว',
+  name_taken: 'มีคนใช้ชื่อนี้ในห้องแล้ว',
+  lobby_full: 'ห้องเต็มแล้ว (สูงสุด 12 คน)',
+  kicked: 'คุณถูกเชิญออกจากห้อง',
+  invalid_name: 'กรุณาใส่ชื่อ',
+  not_host: 'เฉพาะหัวห้องเท่านั้น',
+  not_enough_players: 'ต้องมีผู้เล่นออนไลน์อย่างน้อย 3 คน',
+  match_in_progress: 'เกมกำลังเล่นอยู่',
+  invalid_setting: 'ค่าที่ตั้งไม่ถูกต้อง',
+  invalid_word: 'คำต้องเป็นภาษาไทยล้วนหรืออังกฤษล้วน',
+  duplicate_word: 'มีคำนี้แล้ว',
+  too_many_words: 'เพิ่มได้สูงสุด 20 คำต่อคน',
+  not_your_turn: 'ยังไม่ถึงตาคุณ',
+  not_clueing: 'ตอนนี้ใบ้ไม่ได้',
+  not_guessing: 'ตอนนี้ยังตอบไม่ได้',
+  not_guesser: 'เฉพาะคนทายเท่านั้นที่ตอบได้',
+  not_in_round: 'คุณไม่ได้อยู่ในตานี้',
+  no_round: 'ไม่มีตาที่กำลังเล่น',
+  in_person_mode: 'โหมดเล่นในห้อง ใบ้ด้วยปากได้เลย',
+  empty: 'ยังไม่ได้ใส่คำใบ้',
+  not_one_syllable: 'ต้องเป็น 1 พยางค์เท่านั้น',
+  forbidden_syllable: 'ห้ามใช้พยางค์ที่อยู่ในคำตอบ',
+  wrong_language: 'ภาษาไม่ตรงกับภาษาของเกม',
+}
+
+export const awardText: Record<string, { title: string; detail: (n: number) => string }> = {
+  fastest_guess: { title: 'ทายไวสุด', detail: (n) => `ตอบถูกหลังคำใบ้แค่ ${n} พยางค์` },
+  wild_buzzer: { title: 'Buzz มั่วสุด', detail: (n) => `กด Buzz แล้วผิด ${n} ครั้ง` },
+  best_clue_giver: { title: 'คู่หูใบ้เทพ', detail: (n) => `ได้ ${n} คะแนนจากการใบ้` },
+}

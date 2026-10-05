@@ -1,0 +1,604 @@
+[
+ {
+  "text": "ช้าง",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ม้า",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "หมา",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "แมว",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ไก่",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "เป็ด",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "หมู",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "วัว",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ควาย",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ลิง",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "เสือ",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "สิงโต",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ยีราฟ",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ม้าลาย",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "จระเข้",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "งู",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "เต่า",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "กระต่าย",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "นกฮูก",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ปลาวาฬ",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ปลาฉลาม",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ปลาหมึก",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ผีเสื้อ",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "แมงมุม",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ยุง",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "มด",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "จิงโจ้",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "แพนด้า",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "หมีขั้วโลก",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "นกแก้ว",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ข้าวมันไก่",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ส้มตำ",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ต้มยำกุ้ง",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ผัดไทย",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "หมูกระทะ",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ชาบู",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ข้าวเหนียวมะม่วง",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ไอศกรีม",
+  "category": "food",
+  "accepted": [
+   "ไอติม"
+  ]
+ },
+ {
+  "text": "พิซซ่า",
+  "category": "food",
+  "accepted": [
+   "พิซซา"
+  ]
+ },
+ {
+  "text": "แฮมเบอร์เกอร์",
+  "category": "food",
+  "accepted": [
+   "แฮมเบอเกอร์",
+   "แฮมเบอร์เกอ"
+  ]
+ },
+ {
+  "text": "ก๋วยเตี๋ยว",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ไข่เจียว",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "โจ๊ก",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ขนมปัง",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ทุเรียน",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "มะม่วง",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "แตงโม",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "กล้วย",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "สับปะรด",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ชานมไข่มุก",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "กาแฟ",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "น้ำแข็งไส",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ซูชิ",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ปาท่องโก๋",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "หมูปิ้ง",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "โรงเรียน",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "โรงพยาบาล",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "สนามบิน",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "ทะเล",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "ภูเขา",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "ตลาดนัด",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "ห้างสรรพสินค้า",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "วัด",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "สวนสัตว์",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "ชายหาด",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "ห้องสมุด",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "โรงหนัง",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "สถานีรถไฟ",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "ร้านกาแฟ",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "ป่า",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "น้ำตก",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "สวนสนุก",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "ห้องน้ำ",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "หมอ",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "พยาบาล",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "ตำรวจ",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "ทหาร",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "ครู",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "นักบิน",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "ชาวนา",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "เชฟ",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "นักร้อง",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "นักบินอวกาศ",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "ทนายความ",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "วิศวกร",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "หมอฟัน",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "ไปรษณีย์",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "ช่างตัดผม",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "นักดับเพลิง",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "โทรศัพท์",
+  "category": "thing",
+  "accepted": [
+   "โทรศัพ"
+  ]
+ },
+ {
+  "text": "คอมพิวเตอร์",
+  "category": "thing",
+  "accepted": [
+   "คอมพิวเตอ"
+  ]
+ },
+ {
+  "text": "ร่ม",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "แว่นตา",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "นาฬิกา",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "กระเป๋า",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "รองเท้า",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "ตู้เย็น",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "พัดลม",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "แอร์",
+  "category": "thing",
+  "accepted": [
+   "แอ"
+  ]
+ },
+ {
+  "text": "ทีวี",
+  "category": "thing",
+  "accepted": [
+   "โทรทัศน์"
+  ]
+ },
+ {
+  "text": "จักรยาน",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "มอเตอร์ไซค์",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "รถไฟ",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "เครื่องบิน",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "เรือ",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "ดินสอ",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "ยางลบ",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "กรรไกร",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "หมอน",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "ผ้าห่ม",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "แปรงสีฟัน",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "กระจก",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "เทียน",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "บอลลูน",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "กีตาร์",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "เปียโน",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "ลูกฟุตบอล",
+  "category": "thing",
+  "accepted": [
+   "ฟุตบอล"
+  ]
+ }
+]

@@ -1,0 +1,605 @@
+[
+ {
+  "text": "elephant",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "horse",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "dog",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "cat",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "chicken",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "duck",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "pig",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "cow",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "monkey",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "tiger",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "lion",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "giraffe",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "zebra",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "crocodile",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "snake",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "turtle",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "rabbit",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "owl",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "whale",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "shark",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "octopus",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "butterfly",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "spider",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "mosquito",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "ant",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "kangaroo",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "panda",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "polar bear",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "parrot",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "penguin",
+  "category": "animal",
+  "accepted": []
+ },
+ {
+  "text": "pizza",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "hamburger",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "ice cream",
+  "category": "food",
+  "accepted": [
+   "icecream"
+  ]
+ },
+ {
+  "text": "sushi",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "spaghetti",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "sandwich",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "pancake",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "hot dog",
+  "category": "food",
+  "accepted": [
+   "hotdog"
+  ]
+ },
+ {
+  "text": "french fries",
+  "category": "food",
+  "accepted": [
+   "fries"
+  ]
+ },
+ {
+  "text": "popcorn",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "chocolate",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "banana",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "watermelon",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "pineapple",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "strawberry",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "coffee",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "bubble tea",
+  "category": "food",
+  "accepted": [
+   "boba"
+  ]
+ },
+ {
+  "text": "noodles",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "fried rice",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "cheese",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "donut",
+  "category": "food",
+  "accepted": [
+   "doughnut"
+  ]
+ },
+ {
+  "text": "cookie",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "birthday cake",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "salad",
+  "category": "food",
+  "accepted": []
+ },
+ {
+  "text": "school",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "hospital",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "airport",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "beach",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "mountain",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "library",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "cinema",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "train station",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "zoo",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "museum",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "supermarket",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "church",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "castle",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "desert",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "forest",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "waterfall",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "amusement park",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "bathroom",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "kitchen",
+  "category": "place",
+  "accepted": []
+ },
+ {
+  "text": "doctor",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "nurse",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "police officer",
+  "category": "job",
+  "accepted": [
+   "policeman",
+   "police"
+  ]
+ },
+ {
+  "text": "teacher",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "pilot",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "farmer",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "chef",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "singer",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "astronaut",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "lawyer",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "engineer",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "dentist",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "firefighter",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "barber",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "magician",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "pirate",
+  "category": "job",
+  "accepted": []
+ },
+ {
+  "text": "telephone",
+  "category": "thing",
+  "accepted": [
+   "phone"
+  ]
+ },
+ {
+  "text": "computer",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "umbrella",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "glasses",
+  "category": "thing",
+  "accepted": [
+   "eyeglasses"
+  ]
+ },
+ {
+  "text": "clock",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "backpack",
+  "category": "thing",
+  "accepted": [
+   "back pack"
+  ]
+ },
+ {
+  "text": "shoes",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "refrigerator",
+  "category": "thing",
+  "accepted": [
+   "fridge"
+  ]
+ },
+ {
+  "text": "television",
+  "category": "thing",
+  "accepted": [
+   "tv"
+  ]
+ },
+ {
+  "text": "bicycle",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "motorcycle",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "train",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "airplane",
+  "category": "thing",
+  "accepted": [
+   "aeroplane",
+   "plane"
+  ]
+ },
+ {
+  "text": "boat",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "pencil",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "scissors",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "pillow",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "toothbrush",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "mirror",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "candle",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "balloon",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "guitar",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "piano",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "football",
+  "category": "thing",
+  "accepted": [
+   "soccer ball"
+  ]
+ },
+ {
+  "text": "camera",
+  "category": "thing",
+  "accepted": []
+ },
+ {
+  "text": "rainbow",
+  "category": "thing",
+  "accepted": []
+ }
+]
