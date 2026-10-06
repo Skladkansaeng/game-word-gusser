@@ -48,6 +48,8 @@ class Settings:
     word_language: Literal["th", "en"] = "th"
     word_source: WordSource = "bank"
     cycles: int = 1
+    # Players in each Round: 1 Guesser plus the rest as Clue Givers taking turns.
+    round_players: int = 3
     round_seconds: int = 90
     clue_seconds: int = 10
 
@@ -56,10 +58,10 @@ class Settings:
         "word_language": ("th", "en"),
         "word_source": ("bank", "mixed", "custom"),
     }
-    _RANGES = {"cycles": (1, MAX_CYCLES), "round_seconds": (30, 300), "clue_seconds": (5, 60)}
+    _RANGES = {"cycles": (1, MAX_CYCLES), "round_players": (MIN_PLAYERS, MAX_PLAYERS), "round_seconds": (30, 300), "clue_seconds": (5, 60)}
     # The client speaks camelCase, matching as_dict().
     _WIRE_NAMES = {"playMode": "play_mode", "wordLanguage": "word_language", "wordSource": "word_source",
-                   "roundSeconds": "round_seconds", "clueSeconds": "clue_seconds"}
+                   "roundPlayers": "round_players", "roundSeconds": "round_seconds", "clueSeconds": "clue_seconds"}
 
     def update(self, changes: dict[str, Any]) -> None:
         changes = {self._WIRE_NAMES.get(key, key): value for key, value in changes.items()}
@@ -82,6 +84,7 @@ class Settings:
             "wordLanguage": self.word_language,
             "wordSource": self.word_source,
             "cycles": self.cycles,
+            "roundPlayers": self.round_players,
             "roundSeconds": self.round_seconds,
             "clueSeconds": self.clue_seconds,
         }
@@ -115,7 +118,7 @@ class Round:
     number: int
     cycle: int
     guesser_id: str
-    giver_ids: tuple[str, str]
+    giver_ids: tuple[str, ...]
     word: Word
     round_deadline: float | None
     clue_deadline: float | None
@@ -132,7 +135,7 @@ class Round:
     buzz_locked_until: dict[str, float] = field(default_factory=dict)
 
     @property
-    def participants(self) -> tuple[str, str, str]:
+    def participants(self) -> tuple[str, ...]:
         return (self.guesser_id, *self.giver_ids)
 
     @property
@@ -342,8 +345,10 @@ class Lobby:
         others = [pid for pid in active if pid != guesser]
         self.rng.shuffle(others)
         # Fewest clue-giving turns first; on a tie prefer players who still have a Guesser
-        # turn ahead, since that turn is a Round they can't give clues in.
-        givers = sorted(others, key=lambda pid: (m.clue_counts[pid], pid not in m.guesser_queue))[:2]
+        # turn ahead, since that turn is a Round they can't give clues in. With fewer active
+        # players than the Host asked for, the Round just uses everyone.
+        givers = sorted(others, key=lambda pid: (m.clue_counts[pid], pid not in m.guesser_queue))
+        givers = givers[:m.settings.round_players - 1]
         word = self._pick_word(guesser)
         if word is None:
             m.phase = "podium"
@@ -355,7 +360,7 @@ class Lobby:
         online = m.settings.play_mode == "online"
         m.round = Round(
             number=m.rounds_played, cycle=m.cycle, guesser_id=guesser,
-            giver_ids=(givers[0], givers[1]), word=word,
+            giver_ids=tuple(givers), word=word,
             round_deadline=now + m.settings.round_seconds,
             clue_deadline=now + m.settings.clue_seconds if online else None,
         )
@@ -415,7 +420,7 @@ class Lobby:
             raise GameError(e.reason) from None
 
     def _pass_turn(self, r: Round, now: float) -> None:
-        r.giver_turn = 1 - r.giver_turn
+        r.giver_turn = (r.giver_turn + 1) % len(r.giver_ids)
         r.clue_deadline = now + self.match.settings.clue_seconds
 
     def buzz(self, player_id: str, now: float) -> None:

@@ -10,6 +10,8 @@ export interface Settings {
   wordLanguage: WordLanguage
   wordSource: WordSource
   cycles: number
+  /** Players in each Round: 1 Guesser plus the rest as Clue Givers. */
+  roundPlayers: number
   roundSeconds: number
   clueSeconds: number
 }
@@ -40,7 +42,7 @@ export interface RoundView {
   cycle: number
   role: Role
   guesserId: string
-  giverIds: [string, string]
+  giverIds: string[]
   currentGiverId: string
   phase: 'clueing' | 'guessing' | 'over'
   word: string | null

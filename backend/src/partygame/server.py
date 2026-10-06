@@ -162,7 +162,20 @@ async def play(ws: WebSocket, code: str) -> None:
             await broadcast(lobby)
 
 
+class FrontendFiles(StaticFiles):
+    """Hashed assets may be cached forever, but index.html must be revalidated on every load,
+    otherwise browsers keep running the previous build after a deploy."""
+
+    async def get_response(self, path, scope):
+        response = await super().get_response(path, scope)
+        if response.headers.get("content-type", "").startswith("text/html"):
+            response.headers["Cache-Control"] = "no-cache"
+        elif path.startswith("assets/"):
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return response
+
+
 # Serve the built frontend when it exists (production); in development Vite serves it.
 _dist = Path(os.environ.get("FRONTEND_DIST") or Path(__file__).resolve().parents[3] / "frontend" / "dist")
 if _dist.is_dir():
-    app.mount("/", StaticFiles(directory=_dist, html=True), name="frontend")
+    app.mount("/", FrontendFiles(directory=_dist, html=True), name="frontend")

@@ -148,7 +148,7 @@ input:focus { outline: none; border-color: var(--accent); }
 }
 .timer.low { color: var(--bad); }
 .timer.frozen { opacity: 0.55; }
-.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.trio { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 10px; }
 .seat {
   position: relative; overflow: hidden; display: grid; justify-items: center; gap: 4px; text-align: center;
   background: var(--surface); border-radius: var(--radius); padding: 14px 8px; box-shadow: var(--shadow);

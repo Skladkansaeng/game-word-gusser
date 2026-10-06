@@ -103,6 +103,33 @@ def test_round_has_one_guesser_and_two_distinct_clue_givers():
     assert len({guesser, *givers}) == 3
 
 
+def test_host_sets_how_many_players_each_round_has():
+    lobby, _ = started(6, round_players=4)
+    guesser, givers = roles(lobby)
+    assert len(givers) == 3 and len({guesser, *givers}) == 4
+
+
+def test_round_uses_everyone_when_fewer_players_than_round_size():
+    lobby, _ = started(3, round_players=5)
+    assert len(roles(lobby)[1]) == 2
+
+
+def test_round_size_must_be_in_range():
+    lobby, players = make_lobby(3)
+    with pytest.raises(GameError, match="invalid_setting"):
+        lobby.update_settings(players[0], {"roundPlayers": 2})
+
+
+def test_clue_givers_take_turns_in_order():
+    lobby, _ = started(5, round_players=4)
+    r = lobby.match.round
+    order = []
+    for i in range(4):
+        order.append(r.current_giver_id)
+        lobby.submit_clue(r.current_giver_id, ["หมู", "ไก่", "ปลา", "นก"][i], T0 + 1 + i)
+    assert order[:3] == list(r.giver_ids) and order[3] == r.giver_ids[0]
+
+
 def test_guesser_cannot_see_secret_word_but_clue_giver_can():
     lobby, players = started(4)
     guesser, givers = roles(lobby)

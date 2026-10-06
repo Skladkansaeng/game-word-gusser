@@ -85,6 +85,8 @@ function SettingsPanel({ settings, editable, onChange }: { settings: Settings; e
           options={[['bank', 'คลังคำ'], ['mixed', 'ผสม'], ['custom', 'คำของเพื่อน']]} />
         <Stepper label="จำนวนรอบ" hint="ทุกคนได้เป็นคนทายรอบละ 1 ครั้ง" value={settings.cycles} min={1} max={5}
           onChange={(v) => onChange({ cycles: v })} />
+        <Stepper label="ผู้เล่นต่อตา" hint={`คนทาย 1 คน + คนใบ้ ${settings.roundPlayers - 1} คน`} value={settings.roundPlayers}
+          min={3} max={12} onChange={(v) => onChange({ roundPlayers: v })} />
         <Stepper label="เวลาต่อตา (วินาที)" value={settings.roundSeconds} min={30} max={300} step={15}
           onChange={(v) => onChange({ roundSeconds: v })} />
         {settings.playMode === 'online' && (

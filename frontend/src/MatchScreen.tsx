@@ -39,6 +39,7 @@ function RoundStage({ conn, match, round, players, you }: { conn: LobbyConnectio
   const shownLeft = round.phase === 'guessing' ? round.frozenRemaining : roundLeft
   const lastGuess = round.guesses.at(-1)
   const name = (id: string | null) => (id ? players[id]?.name ?? '?' : '?')
+  const listNames = (ids: string[]) => ids.map(name).join(', ').replace(/, ([^,]*)$/, ' กับ $1')
   const inRound = round.role !== 'spectator'
 
   return (
@@ -73,8 +74,8 @@ function RoundStage({ conn, match, round, players, you }: { conn: LobbyConnectio
           ) : (
             <div className="card in-person-note">
               {round.role === 'clue_giver'
-                ? `ผลัดกันพูดใบ้กับ ${name(round.giverIds.find((g) => g !== you) ?? null)} ทีละพยางค์ ห้ามใช้พยางค์ในคำตอบ`
-                : `ฟัง ${name(round.giverIds[0])} กับ ${name(round.giverIds[1])} ใบ้ทีละพยางค์`}
+                ? `ผลัดกันพูดใบ้กับ ${listNames(round.giverIds.filter((g) => g !== you))} ทีละพยางค์ ห้ามใช้พยางค์ในคำตอบ`
+                : `ฟัง ${listNames(round.giverIds)} ใบ้ทีละพยางค์`}
             </div>
           )}
 

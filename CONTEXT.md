@@ -1,6 +1,6 @@
 # Party Game (ใบ้คำทีละพยางค์)
 
-เกมปาร์ตี้บนเว็บ ผู้เล่นรวมตัวกันใน Lobby แล้วผลัดกันเล่นทีละ 3 คน: Clue Giver 2 คนผลัดกันใบ้คำลับทีละพยางค์ ให้ Guesser 1 คนทาย
+เกมปาร์ตี้บนเว็บ ผู้เล่นรวมตัวกันใน Lobby แล้วผลัดกันเล่นทีละกลุ่ม (ค่าเริ่มต้น 3 คน): Clue Giver ผลัดกันใบ้คำลับทีละพยางค์ ให้ Guesser 1 คนทาย
 
 ## Language
 
@@ -22,7 +22,7 @@ _Avoid_: Game, Session
 _Avoid_: รอบ (คำนี้กำกวม)
 
 **Round**:
-การเล่นหนึ่งคำ: เลือกผู้เล่น 3 คน (Guesser 1, Clue Giver 2) สุ่ม Secret Word 1 คำ แล้วเล่นจนจบ
+การเล่นหนึ่งคำ: เลือกผู้เล่นตาม Round Size (Guesser 1, ที่เหลือเป็น Clue Giver) สุ่ม Secret Word 1 คำ แล้วเล่นจนจบ
 _Avoid_: Turn, รอบ
 
 **Clue**:
@@ -30,7 +30,7 @@ _Avoid_: Turn, รอบ
 _Avoid_: Hint
 
 **Clue Chain**:
-วลีที่ค่อย ๆ ก่อตัวขึ้นใน Round จากการที่ Clue Giver 2 คนผลัดกันต่อ Clue ทีละพยางค์ (เช่น "สัตว์-ตัว-ใหญ่-มี-งวง")
+วลีที่ค่อย ๆ ก่อตัวขึ้นใน Round จากการที่ Clue Giver ผลัดกันต่อ Clue ทีละพยางค์ (เช่น "สัตว์-ตัว-ใหญ่-มี-งวง")
 _Avoid_: Hint list, Sentence
 
 **Forbidden Syllable**:
@@ -97,8 +97,11 @@ Guess ที่สะกดผิดเล็กน้อย (คำยาว 4+
 วิธีส่ง Clue ใน Match มี 2 แบบ: **Online** (ส่ง Clue ผ่านแอปด้วยการพิมพ์หรือไมค์ ระบบบังคับกฎพยางค์) และ **In-Person** (ผู้เล่นนั่งอยู่ด้วยกันและพูด Clue ออกเสียงกันเอง แอปทำหน้าที่แค่โชว์คำ มีปุ่ม Buzz และช่องพิมพ์ Guess)
 _Avoid_: Offline mode (ยังต้องใช้ server อยู่)
 
+**Round Size**:
+จำนวนผู้เล่นใน Round หนึ่ง (Guesser 1 คน + Clue Giver ที่เหลือ ผลัดกันใบ้ตามลำดับ) ค่าเริ่มต้น 3 Host ตั้งได้ 3–12; ถ้าผู้เล่นที่ไม่ใช่ Away มีน้อยกว่านี้ Round จะใช้ทุกคนที่มี
+
 **Match Settings**:
-ค่าที่ Host ตั้งก่อนเริ่ม Match: Play Mode, Word Source, จำนวน Cycle, Word Language, Round Timer, Clue Timer (ใช้เฉพาะ Online)
+ค่าที่ Host ตั้งก่อนเริ่ม Match: Play Mode, Word Source, จำนวน Cycle, Round Size, Word Language, Round Timer, Clue Timer (ใช้เฉพาะ Online)
 
 ### Timing
 
@@ -141,7 +144,7 @@ _Avoid_: Offline mode (ยังต้องใช้ server อยู่)
 - **Lobby** หนึ่งห้องรัน **Match** ได้หลายครั้ง (ทีละครั้ง)
 - **Match** หนึ่งครั้งมี N **Cycle** (Host เป็นคนกำหนด N)
 - **Cycle** หนึ่งชุดมี **Round** เท่ากับจำนวนผู้เล่น โดยแต่ละคนเป็น **Guesser** คนละ 1 ครั้งพอดี
-- **Round** หนึ่งรอบมี **Guesser** 1 คน **Clue Giver** 2 คน และ **Secret Word** 1 คำ
+- **Round** หนึ่งรอบมี **Guesser** 1 คน **Clue Giver** (Round Size − 1) คน และ **Secret Word** 1 คำ
 - **Clue** ต้องเป็น 1 พยางค์ตามกฎของ **Word Language** ไม่ว่าจะพิมพ์หรือพูด; ถ้าพิมพ์มาเกิน 1 พยางค์จะถูกปฏิเสธ ถ้าพูดระบบจะเก็บแค่พยางค์แรกแล้วให้ Clue Giver ยืนยันก่อนส่ง
 - ใน **In-Person** ผู้เล่นคุมกฎ 1 พยางค์และ **Forbidden Syllable** กันเอง, ไม่มี **Clue Timer** และ **Secret Word** บนจอ Clue Giver จะถูกซ่อนไว้จนกว่าจะกดค้าง; ผู้เล่นทุกคนยังใช้เครื่องของตัวเอง
 - **Host** เห็นแค่ความยาว (จำนวนพยางค์และตัวอักษร) ของ **Custom Word** ของคนอื่น ไม่เห็นตัวคำ; Host ลบได้ทั้งทีละคำ (เลือกจากความยาว) และลบทั้งหมดของ Author คนหนึ่ง
