@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { HistoryButton } from './History'
 import { Avatar } from './LobbyScreen'
 import { awardText } from './text'
 import type { LobbyState, MatchView, PlayerInfo, RoundView } from './types'
@@ -380,6 +381,7 @@ function Scoreboard({ state, match, players }: { state: LobbyState; match: Match
           )
         })}
       </ol>
+      <HistoryButton state={state} className="btn small history-open" />
     </aside>
   )
 }

@@ -74,6 +74,7 @@ input:focus { outline: none; border-color: var(--accent); }
 
 .tag { font-size: 0.72rem; padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--ink); white-space: nowrap; }
 .tag.ghost { background: transparent; border: 1px dashed var(--muted); color: var(--muted); }
+.tag.ready { background: var(--good); color: #fff; }
 .avatar {
   display: inline-grid; place-items: center; border-radius: 50%; color: #fff;
   font-family: 'Mitr', sans-serif; flex: none; text-shadow: 0 1px 2px rgba(0,0,0,0.25);
@@ -136,6 +137,7 @@ input:focus { outline: none; border-color: var(--accent); }
   background: linear-gradient(transparent, var(--bg) 30%);
 }
 .start-bar > * { max-width: 420px; margin: 0 auto; }
+.start-bar > .btn + p { margin-top: 6px; }
 
 /* Match */
 .match { max-width: 1080px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
@@ -261,3 +263,28 @@ input:focus { outline: none; border-color: var(--accent); }
 .chips.lengths li.long { background: color-mix(in srgb, var(--bad) 18%, transparent); color: var(--bad); }
 .close-guess { margin: 0; padding: 10px 14px; border-radius: var(--radius, 12px); background: var(--surface); text-align: center; }
 .close-guess strong { color: var(--good); }
+
+/* History */
+.history-open { margin-top: 12px; width: 100%; }
+dialog.history {
+  border: 0; padding: 0; border-radius: var(--radius); background: var(--surface); color: var(--ink);
+  width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); box-shadow: var(--shadow);
+}
+dialog.history::backdrop { background: rgba(20, 12, 6, 0.5); }
+.history-inner { display: grid; gap: 12px; padding: 20px; }
+.history-head { display: flex; align-items: center; }
+.history-head h2 { margin: 0; }
+.history-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+dialog.history .history-item { padding: 12px 14px; border-radius: 14px; align-items: stretch; background: var(--bg); border-radius: 14px; padding: 12px 14px; display: grid; gap: 6px; }
+.history-item p { margin: 0; }
+.history-row { display: flex; align-items: baseline; gap: 8px; }
+.history-word { font-family: 'Mitr', sans-serif; font-weight: 500; font-size: 1.3rem; min-width: 0; overflow-wrap: anywhere; }
+.history-row .tag { margin-left: auto; }
+.history-item.correct .tag { background: var(--good); color: #fff; }
+.history-clues { display: flex; flex-wrap: wrap; gap: 6px; }
+.history-clues .syllable { font-size: 1.05rem; padding: 2px 10px; background: var(--surface); animation: none; }
+.history-share {
+  position: sticky; bottom: -20px; margin: 0 -20px -20px; padding: 12px 20px 20px;
+  background: var(--surface); display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.history-status { margin: 0; text-align: center; grid-column: 1 / -1; }

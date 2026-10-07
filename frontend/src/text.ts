@@ -22,6 +22,7 @@ export const errorText: Record<string, string> = {
   not_one_syllable: 'ต้องเป็น 1 พยางค์เท่านั้น',
   forbidden_syllable: 'ห้ามใช้พยางค์ที่อยู่ในคำตอบ',
   wrong_language: 'ภาษาไม่ตรงกับภาษาของเกม',
+  players_not_ready: 'รอทุกคนกดพร้อมก่อน',
   missing_custom_words: 'ทุกคนต้องเพิ่มคำของตัวเองอย่างน้อย 1 คำก่อนเริ่ม',
   buzz_locked: 'เพิ่ง Buzz ผิด รอแป๊บนึงก่อนกดใหม่',
 }

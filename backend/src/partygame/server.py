@@ -93,6 +93,8 @@ def handle(lobby: Lobby, player_id: str, msg: dict, now: float) -> dict | None:
             lobby.clear_custom_words(player_id, str(msg.get("playerId", "")))
         case "kick":
             lobby.kick(player_id, str(msg.get("playerId", "")))
+        case "set_ready":
+            lobby.set_ready(player_id, bool(msg.get("ready")))
         case "start_match":
             lobby.start_match(player_id, now)
         case "return_to_lobby":

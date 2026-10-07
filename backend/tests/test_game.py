@@ -7,6 +7,7 @@ from partygame.game import (
     BUZZ_LOCK_SECONDS,
     GUESS_SECONDS,
     REVEAL_SECONDS,
+    Clue,
     GameError,
     Lobby,
 )
@@ -23,9 +24,15 @@ def make_lobby(n=3, seed=1, **settings):
     return lobby, players
 
 
+def start(lobby, players):
+    for p in players:
+        lobby.set_ready(p, True)
+    lobby.start_match(players[0], T0)
+
+
 def started(n=3, seed=1, **settings):
     lobby, players = make_lobby(n, seed, **settings)
-    lobby.start_match(players[0], T0)
+    start(lobby, players)
     return lobby, players
 
 
@@ -80,6 +87,37 @@ def test_only_host_can_start_and_needs_three_players():
     lobby.join("p2", None, T0)
     with pytest.raises(GameError, match="not_host"):
         lobby.start_match(players[1], T0)
+
+
+def test_everyone_but_the_host_must_be_ready_to_start():
+    lobby, players = make_lobby(3)
+    lobby.set_ready(players[1], True)
+    assert [p["ready"] for p in lobby.view(players[0], T0)["players"]] == [True, True, False]
+    with pytest.raises(GameError, match="players_not_ready"):
+        lobby.start_match(players[0], T0)
+    lobby.set_ready(players[2], True)
+    lobby.start_match(players[0], T0)
+    assert not any(p.ready for p in lobby.players.values())
+    with pytest.raises(GameError, match="match_in_progress"):
+        lobby.set_ready(players[1], False)
+
+
+def test_cannot_ready_without_a_custom_word_when_source_is_custom():
+    lobby, players = make_lobby(3, word_source="custom")
+    with pytest.raises(GameError, match="missing_custom_words"):
+        lobby.set_ready(players[1], True)
+    lobby.add_custom_word(players[1], "หมูเด้ง")
+    lobby.set_ready(players[1], True)
+    assert lobby.players[players[1]].ready
+
+
+def test_offline_players_do_not_block_ready():
+    lobby, players = make_lobby(4)
+    for p in players[1:3]:
+        lobby.set_ready(p, True)
+    lobby.disconnect(players[3], T0)
+    lobby.start_match(players[0], T0)
+    assert lobby.match.participants == players[:3]
 
 
 def test_host_moves_to_longest_present_player_on_disconnect():
@@ -416,7 +454,7 @@ def test_custom_word_is_never_given_to_its_author_as_guesser():
     lobby, players = make_lobby(3, word_source="custom")
     for p in players:
         lobby.add_custom_word(p, f"คำของ{['หนึ่ง', 'สอง', 'สาม'][players.index(p)]}")
-    lobby.start_match(players[0], T0)
+    start(lobby, players)
     now = T0
     while lobby.match.phase != "podium":
         r = lobby.match.round
@@ -438,7 +476,7 @@ def test_custom_only_falls_back_to_word_bank():
     lobby, players = make_lobby(3, word_source="custom", cycles=2)
     for p, w in zip(players, ["หมูเด้ง", "น้องแมว", "ชาไทย"]):
         lobby.add_custom_word(p, w)
-    lobby.start_match(players[0], T0)
+    start(lobby, players)
     now, words = T0, []
     while lobby.match.phase != "podium":
         words.append(lobby.match.round.word)
@@ -531,3 +569,39 @@ def test_only_host_can_remove_by_id():
     word_id = lobby.custom_words[0].id
     with pytest.raises(GameError, match="not_host"):
         lobby.remove_custom_word_by_id(players[2], word_id)
+
+
+# --- History -------------------------------------------------------------------
+
+
+def test_history_records_each_finished_round_with_clues_and_guesses():
+    lobby, players = started(3)
+    guesser, givers = roles(lobby)
+    word = lobby.match.round.word.text
+    lobby.match.round.clues.append(Clue(givers[0], "สัตว์"))
+    lobby.buzz(guesser, T0 + 1)
+    lobby.submit_guess(guesser, "ผิดแน่นอน", T0 + 2)
+    assert lobby.history == []  # nothing until the Round is over
+    win_round(lobby, T0 + 10)
+    [entry] = lobby.history
+    assert entry["match"] == 1 and entry["number"] == 1
+    assert entry["word"] == word and entry["outcome"] == "correct"
+    assert entry["guesserId"] == guesser and entry["giverIds"] == list(givers)
+    assert entry["clues"] == [{"playerId": givers[0], "text": "สัตว์"}]
+    assert [g["correct"] for g in entry["guesses"]] == [False, True]
+    assert entry["people"][guesser]["name"] == lobby.players[guesser].name
+
+
+def test_history_is_shown_to_everyone_and_survives_the_next_match():
+    lobby, players = started(3)
+    now = T0
+    while lobby.match.phase != "podium":
+        lobby.tick(now + 1000)  # every Round times out
+        now = finish_reveal(lobby, now + 1000)
+    lobby.return_to_lobby(players[0])
+    start(lobby, players)
+    lobby.tick(now + 2000)
+    assert [e["match"] for e in lobby.history] == [1, 1, 1, 2]
+    assert all(e["outcome"] == "timeout" for e in lobby.history)
+    assert lobby.view(players[1], now)["history"] == lobby.history
+

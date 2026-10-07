@@ -22,6 +22,8 @@ export interface PlayerInfo {
   color: string
   connected: boolean
   away: boolean
+  /** Pressed Ready in the Lobby. Always true for the Host. */
+  ready: boolean
 }
 
 export interface Clue {
@@ -91,6 +93,24 @@ export interface CustomWordLength {
   syllables: number
 }
 
+/** One finished Round, kept in the Lobby across Matches. */
+export interface HistoryEntry {
+  /** Which Match in this Lobby, counting from 1. */
+  match: number
+  number: number
+  cycle: number
+  playMode: PlayMode
+  word: string
+  outcome: 'correct' | 'timeout' | 'skipped'
+  guesserId: string
+  giverIds: string[]
+  clues: Clue[]
+  guesses: GuessRecord[]
+  points: Record<string, number>
+  /** Names as they were when the Round ended, so kicked players still read right. */
+  people: Record<string, { name: string; color: string }>
+}
+
 export interface LobbyState {
   code: string
   you: string
@@ -108,6 +128,7 @@ export interface LobbyState {
     missing: string[]
   }
   match: MatchView | null
+  history: HistoryEntry[]
 }
 
 export type ClientMessage =
@@ -117,6 +138,7 @@ export type ClientMessage =
   | { type: 'remove_custom_word_by_id'; wordId: string }
   | { type: 'clear_custom_words'; playerId: string }
   | { type: 'kick'; playerId: string }
+  | { type: 'set_ready'; ready: boolean }
   | { type: 'start_match' }
   | { type: 'return_to_lobby' }
   | { type: 'clue'; text: string }

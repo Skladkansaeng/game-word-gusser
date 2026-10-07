@@ -20,6 +20,10 @@ def test_three_players_can_start_a_match_and_only_clue_givers_get_the_word():
             for ws, name in ((a, "A"), (b, "B"), (c, "C")):
                 ws.send_json({"name": name})
                 ids[name] = receive_until(ws, "welcome")["playerId"]
+            for ws in (b, c):
+                ws.send_json({"type": "set_ready", "ready": True})
+            while not all(p["ready"] for p in receive_until(a, "state")["state"]["players"]):
+                pass
             a.send_json({"type": "start_match"})
             views = {}
             for ws, name in ((a, "A"), (b, "B"), (c, "C")):

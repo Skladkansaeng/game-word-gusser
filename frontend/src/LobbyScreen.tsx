@@ -1,5 +1,6 @@
 import { QRCodeSVG } from 'qrcode.react'
 import { useState } from 'react'
+import { HistoryButton } from './History'
 import type { LobbyState, Settings } from './types'
 import type { LobbyConnection } from './useLobby'
 
@@ -8,6 +9,8 @@ export function LobbyScreen({ conn, state }: { conn: LobbyConnection; state: Lob
   const link = `${location.origin}/?lobby=${state.code}`
   const online = state.players.filter((p) => p.connected).length
   const missing = state.customWords.missing
+  const notReady = state.players.filter((p) => p.connected && !p.ready)
+  const meReady = state.players.find((p) => p.id === state.you)?.ready ?? false
   const names = (ids: string[]) => ids.map((id) => state.players.find((p) => p.id === id)?.name).join(', ')
   const [copied, setCopied] = useState(false)
 
@@ -28,6 +31,7 @@ export function LobbyScreen({ conn, state }: { conn: LobbyConnection; state: Lob
         <p className="lobby-code">{state.code}</p>
         <div className="qr"><QRCodeSVG value={link} size={132} bgColor="transparent" fgColor="currentColor" /></div>
         <button className="btn small" onClick={copy}>{copied ? 'คัดลอกแล้ว' : 'คัดลอกลิงก์'}</button>
+        <HistoryButton state={state} />
       </section>
 
       <section className="card players">
@@ -38,7 +42,8 @@ export function LobbyScreen({ conn, state }: { conn: LobbyConnection; state: Lob
               <Avatar name={p.name} color={p.color} />
               <span className="pname">{p.name}{p.id === state.you && <em> (คุณ)</em>}</span>
               {p.id === state.hostId && <span className="tag">หัวห้อง</span>}
-              {!p.connected && <span className="tag ghost">ออฟไลน์</span>}
+              {!p.connected ? <span className="tag ghost">ออฟไลน์</span>
+                : p.id !== state.hostId && <span className={p.ready ? 'tag ready' : 'tag ghost'}>{p.ready ? 'พร้อม' : 'ยังไม่พร้อม'}</span>}
               {isHost && p.id !== state.you && (
                 <button className="link" onClick={() => conn.send({ type: 'kick', playerId: p.id })}>เชิญออก</button>
               )}
@@ -53,11 +58,22 @@ export function LobbyScreen({ conn, state }: { conn: LobbyConnection; state: Lob
 
       <div className="start-bar">
         {isHost ? (
-          <button className="btn primary big" disabled={online < 3 || missing.length > 0} onClick={() => conn.send({ type: 'start_match' })}>
-            {online < 3 ? `รอผู้เล่นอีก ${3 - online} คน` : missing.length > 0 ? `รอ ${names(missing)} เพิ่มคำ` : 'เริ่มเกม'}
+          <button className="btn primary big" disabled={online < 3 || missing.length > 0 || notReady.length > 0} onClick={() => conn.send({ type: 'start_match' })}>
+            {online < 3 ? `รอผู้เล่นอีก ${3 - online} คน`
+              : missing.length > 0 ? `รอ ${names(missing)} เพิ่มคำ`
+              : notReady.length > 0 ? `รอ ${notReady.map((p) => p.name).join(', ')} กดพร้อม`
+              : 'เริ่มเกม'}
           </button>
         ) : (
-          <p className="muted">{missing.includes(state.you) ? 'เพิ่มคำของคุณอย่างน้อย 1 คำ หัวห้องถึงจะเริ่มได้' : 'รอหัวห้องกดเริ่มเกม…'}</p>
+          <>
+            <button className={meReady ? 'btn big' : 'btn primary big'} disabled={!meReady && missing.includes(state.you)} onClick={() => conn.send({ type: 'set_ready', ready: !meReady })}>
+              {meReady ? 'ยกเลิกพร้อม' : 'พร้อม!'}
+            </button>
+            <p className="muted">
+              {missing.includes(state.you) ? 'เพิ่มคำของคุณอย่างน้อย 1 คำก่อน ถึงจะกดพร้อมได้'
+                : meReady ? 'รอหัวห้องกดเริ่มเกม…' : 'กดพร้อมเมื่อพร้อมเล่น หัวห้องจะเริ่มได้เมื่อทุกคนพร้อม'}
+            </p>
+          </>
         )}
       </div>
     </main>

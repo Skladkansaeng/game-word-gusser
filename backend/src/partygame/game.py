@@ -20,6 +20,8 @@ MAX_CUSTOM_WORDS_PER_PLAYER = 20
 AWAY_GRACE_SECONDS = 5.0
 GUESS_SECONDS = 20.0
 REVEAL_SECONDS = 6.0
+# Oldest Rounds drop off the Lobby's History past this many.
+MAX_HISTORY_ROUNDS = 100
 
 GUESSER_POINTS = 3
 CLUE_GIVER_POINTS = 1
@@ -100,6 +102,8 @@ class Player:
     connected: bool = True
     disconnected_at: float | None = None
     kicked: bool = False
+    # Pressed Ready in the Lobby; cleared when a Match starts so each Match asks again.
+    ready: bool = False
 
     def is_away(self, now: float) -> bool:
         if self.kicked:
@@ -171,6 +175,9 @@ class Lobby:
         self.settings = Settings()
         self.custom_words: list[Word] = []
         self.match: Match | None = None
+        self.matches_played = 0
+        # Every finished Round in this Lobby, across Matches, oldest first.
+        self.history: list[dict[str, Any]] = []
         self.version = 0
         self.last_active = now
 
@@ -279,6 +286,18 @@ class Lobby:
         self.custom_words = [w for w in self.custom_words if w.author_id != author_id]
         self.version += 1
 
+    def set_ready(self, player_id: str, ready: bool) -> None:
+        if self.match and self.match.phase != "podium":
+            raise GameError("match_in_progress")
+        if ready and self.players_missing_custom_words([player_id]):
+            raise GameError("missing_custom_words")
+        self.players[player_id].ready = ready
+        self.version += 1
+
+    def players_not_ready(self, player_ids: list[str]) -> list[str]:
+        """Everyone but the Host must press Ready; the Host pressing start counts as theirs."""
+        return [pid for pid in player_ids if pid != self.host_id and not self.players[pid].ready]
+
     def start_match(self, by: str, now: float) -> None:
         self._require_host(by)
         if self.match and self.match.phase != "podium":
@@ -288,8 +307,13 @@ class Lobby:
             raise GameError("not_enough_players")
         if self.players_missing_custom_words(ready):
             raise GameError("missing_custom_words")
+        if self.players_not_ready(ready):
+            raise GameError("players_not_ready")
+        for pid in ready:
+            self.players[pid].ready = False
         self.match = Match(settings=Settings(**vars(self.settings)), participants=ready,
                            scores=Counter({pid: 0 for pid in ready}))
+        self.matches_played += 1
         self._next_round(now)
         self._touch(now)
 
@@ -487,6 +511,27 @@ class Lobby:
         r.round_deadline = r.clue_deadline = r.guess_deadline = None
         self.match.phase = "reveal"
         self.match.reveal_until = now + REVEAL_SECONDS
+        self._record_history(r)
+
+    def _record_history(self, r: Round) -> None:
+        # Names are copied in so the History still reads right after someone is kicked.
+        people = {pid: {"name": self.players[pid].name, "color": self.players[pid].color}
+                  for pid in r.participants}
+        self.history.append({
+            "match": self.matches_played,
+            "number": r.number,
+            "cycle": r.cycle,
+            "playMode": self.match.settings.play_mode,
+            "word": r.word.text,
+            "outcome": r.outcome,
+            "guesserId": r.guesser_id,
+            "giverIds": list(r.giver_ids),
+            "clues": [{"playerId": c.player_id, "text": c.text} for c in r.clues],
+            "guesses": [dict(g) for g in r.guesses],
+            "points": dict(r.points),
+            "people": people,
+        })
+        del self.history[:-MAX_HISTORY_ROUNDS]
 
     def _skip_round(self, r: Round, away: list[str], now: float) -> None:
         m = self.match
@@ -544,7 +589,7 @@ class Lobby:
             "settings": self.settings.as_dict(),
             "players": [
                 {"id": p.id, "name": p.name, "color": p.color, "connected": p.connected,
-                 "away": p.is_away(now)}
+                 "away": p.is_away(now), "ready": p.ready or p.id == self.host_id}
                 for p in sorted(self.players.values(), key=lambda p: p.joined_at) if not p.kicked
             ],
             "customWords": {
@@ -561,6 +606,7 @@ class Lobby:
                     [p.id for p in self.players.values() if p.connected and not p.kicked]),
             },
             "match": self._match_view(viewer_id) if m else None,
+            "history": self.history,
         }
 
     def _match_view(self, viewer_id: str) -> dict[str, Any]:
